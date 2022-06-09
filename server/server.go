@@ -35,7 +35,7 @@ func New(hs *http.Server) *Server {
 	return s
 }
 
-func (s *Server) Register(c envflag.Config) {
+func (s *Server) Register(c *envflag.Config) {
 	c.StringVar(&s.gchat.Endpoint, "earbug.gchat", "", "webhook for google chat space to post summaries")
 	c.StringVar(&s.bucket, "earbug.bucket", "", "storage bucket to read user data from")
 }
