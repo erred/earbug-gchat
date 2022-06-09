@@ -95,7 +95,7 @@ func (s *Server) summary(rw http.ResponseWriter, r *http.Request) {
 	}(r.Method, r.Body)
 	if err != nil {
 		http.Error(rw, msg, code)
-		log.Error(err, msg)
+		log.Error(err, msg, "ctx", ctx, "http_request", r)
 		return
 	}
 
@@ -133,7 +133,7 @@ func (s *Server) summary(rw http.ResponseWriter, r *http.Request) {
 	}(user)
 	if err != nil {
 		http.Error(rw, msg, code)
-		log.Error(err, msg)
+		log.Error(err, msg, "ctx", ctx, "http_request", r)
 		return
 	}
 
@@ -175,10 +175,10 @@ func (s *Server) summary(rw http.ResponseWriter, r *http.Request) {
 	}(data)
 	if err != nil {
 		http.Error(rw, msg, code)
-		log.Error(err, msg)
+		log.Error(err, msg, "ctx", ctx, "http_request", r)
 		return
 	}
 
 	rw.Write([]byte(msg))
-	log.Info("posted summary")
+	log.Info("posted summary", "ctx", ctx, "http_request", r)
 }
