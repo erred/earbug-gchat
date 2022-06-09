@@ -13,6 +13,9 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/go-logr/logr"
 	"github.com/klauspost/compress/zstd"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	earbugv3 "go.seankhliao.com/earbug/v3/pb/earbug/v3"
 	"go.seankhliao.com/gchat"
 	"go.seankhliao.com/svcrunner"
@@ -22,9 +25,12 @@ import (
 
 type Server struct {
 	bucket string
-	bkt    *storage.BucketHandle
-	gchat  gchat.WebhookClient
-	log    logr.Logger
+
+	bkt   *storage.BucketHandle
+	gchat gchat.WebhookClient
+
+	log   logr.Logger
+	trace trace.Tracer
 }
 
 func New(hs *http.Server) *Server {
@@ -42,12 +48,17 @@ func (s *Server) Register(c *envflag.Config) {
 
 func (s *Server) Init(ctx context.Context, t svcrunner.Tools) error {
 	s.log = t.Log.WithName("earbug-gchat")
+	s.trace = otel.Tracer("earbug-gchat")
+
 	client, err := storage.NewClient(ctx)
 	if err != nil {
 		return fmt.Errorf("create storage client: %w", err)
 	}
+
 	s.bkt = client.Bucket(s.bucket)
-	s.gchat.Client = http.DefaultClient
+	s.gchat.Client = &http.Client{
+		Transport: otelhttp.NewTransport(nil),
+	}
 	return nil
 }
 
@@ -56,17 +67,21 @@ type userReq struct {
 }
 
 func (s *Server) summary(rw http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
 	log := s.log.WithName("summary")
+	ctx, span := s.trace.Start(r.Context(), "summary")
+	defer span.End()
 
-	msg, code, err := func(method string, body io.ReadCloser) (string, int, error) {
+	user, msg, code, err := func(method string, body io.ReadCloser) (string, string, int, error) {
+		ctx, span = s.trace.Start(ctx, "extract-user")
+		defer span.End()
+
 		if r.Method != http.MethodPost {
 			log = log.WithValues("method", r.Method)
-			return "invalid method", http.StatusMethodNotAllowed, errors.New("POST only")
+			return "", "invalid method", http.StatusMethodNotAllowed, errors.New("POST only")
 		}
 		b, err := io.ReadAll(r.Body)
 		if err != nil {
-			return "read body", http.StatusBadRequest, err
+			return "", "read body", http.StatusBadRequest, err
 		}
 		var user userReq
 		err = json.Unmarshal(b, &user)
@@ -74,35 +89,57 @@ func (s *Server) summary(rw http.ResponseWriter, r *http.Request) {
 			err = errors.New("no user provided")
 		}
 		if err != nil {
-			return "unmarshal body", http.StatusBadRequest, err
+			return "", "unmarshal body", http.StatusBadRequest, err
 		}
+		return user.User, "", 0, nil
+	}(r.Method, r.Body)
+	if err != nil {
+		http.Error(rw, msg, code)
+		log.Error(err, msg)
+		return
+	}
 
-		key := user.User + ".pb.zstd"
-		log = log.WithValues("user", user.User)
+	log = log.WithValues("user", user)
 
+	data, msg, code, err := func(user string) (*earbugv3.Store, string, int, error) {
+		ctx, span = s.trace.Start(ctx, "read-data")
+		defer span.End()
+
+		key := user + ".pb.zstd"
 		obj := s.bkt.Object(key)
 		or, err := obj.NewReader(ctx)
 		if err != nil {
-			return "create object reader", http.StatusInternalServerError, err
+			return nil, "create object reader", http.StatusInternalServerError, err
 		}
 		defer or.Close()
 
 		zr, err := zstd.NewReader(or)
 		if err != nil {
-			return "create zstd reader", http.StatusInternalServerError, err
+			return nil, "create zstd reader", http.StatusInternalServerError, err
 		}
 		defer zr.Close()
 
-		b, err = io.ReadAll(zr)
+		b, err := io.ReadAll(zr)
 		if err != nil {
-			return "read object", http.StatusInternalServerError, err
+			return nil, "read object", http.StatusInternalServerError, err
 		}
 
 		var data earbugv3.Store
 		err = proto.Unmarshal(b, &data)
 		if err != nil {
-			return "unmarshal as proto", http.StatusInternalServerError, err
+			return nil, "unmarshal as proto", http.StatusInternalServerError, err
 		}
+		return &data, "", 0, nil
+	}(user)
+	if err != nil {
+		http.Error(rw, msg, code)
+		log.Error(err, msg)
+		return
+	}
+
+	msg, code, err = func(data *earbugv3.Store) (string, int, error) {
+		ctx, span = s.trace.Start(ctx, "post-summary")
+		defer span.End()
 
 		playedBefore := make(map[string]struct{})
 		playedYesterday := make(map[string]struct{})
@@ -135,7 +172,7 @@ func (s *Server) summary(rw http.ResponseWriter, r *http.Request) {
 		}
 
 		return "ok", http.StatusOK, nil
-	}(r.Method, r.Body)
+	}(data)
 	if err != nil {
 		http.Error(rw, msg, code)
 		log.Error(err, msg)
