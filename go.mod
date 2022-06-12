@@ -11,7 +11,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.7.0
 	go.seankhliao.com/earbug/v3 v3.0.0-20220612154923-37f6e7c7ac0a
 	go.seankhliao.com/gchat v0.0.0-20220612154931-8f1077ccd269
-	go.seankhliao.com/svcrunner v0.2.4
+	go.seankhliao.com/svcrunner v0.2.6
 	google.golang.org/protobuf v1.28.0
 )
 
@@ -20,7 +20,6 @@ require (
 	cloud.google.com/go/compute v1.6.1 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
 	cloud.google.com/go/trace v1.2.0 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go v0.32.1 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.8.1 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.32.1 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
@@ -33,6 +32,7 @@ require (
 	github.com/googleapis/go-type-adapters v1.0.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.7.0 // indirect
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.7.0 // indirect
 	go.opentelemetry.io/otel/metric v0.30.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.7.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
