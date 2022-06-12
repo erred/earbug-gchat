@@ -11,7 +11,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.7.0
 	go.seankhliao.com/earbug/v3 v3.0.0-20220611202851-f2a097c83a1b
 	go.seankhliao.com/gchat v0.0.0-20220606145341-27700a74582c
-	go.seankhliao.com/svcrunner v0.2.2
+	go.seankhliao.com/svcrunner v0.2.3
 	google.golang.org/protobuf v1.28.0
 )
 
