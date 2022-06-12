@@ -249,10 +249,10 @@ go.opentelemetry.io/otel/sdk v1.7.0/go.mod h1:uTEOTwaqIVuTGiJN7ii13Ibp75wJmYUDe3
 go.opentelemetry.io/otel/trace v1.7.0 h1:O37Iogk1lEkMRXewVtZ1BBTVn5JEp8GrJvP92bJqC6o=
 go.opentelemetry.io/otel/trace v1.7.0/go.mod h1:fzLSB9nqR2eXzxPXb2JW9IKE+ScyXA48yyE4TNvoHqU=
 go.opentelemetry.io/proto/otlp v0.7.0/go.mod h1:PqfVotwruBrMGOCsRd/89rSnXhoiJIqeYNgFYFoEGnI=
-go.seankhliao.com/earbug/v3 v3.0.0-20220611202851-f2a097c83a1b h1:2c0D0U0PN9bmCAW5P0pSkZtoBht3CqioVzIEPUhRfXw=
-go.seankhliao.com/earbug/v3 v3.0.0-20220611202851-f2a097c83a1b/go.mod h1:hD98WoFl6ram206WQfNFaKbkr4+mauYGZV/6nnW+aO0=
-go.seankhliao.com/gchat v0.0.0-20220606145341-27700a74582c h1:X/0KrX41YpofGDUB/px99oJsPuJZ+HYdfTIGbcyB2+U=
-go.seankhliao.com/gchat v0.0.0-20220606145341-27700a74582c/go.mod h1:wtQXcAF9rzTjUwuqHC1R/B+ytI+W8ztkeaKmSUxu/wE=
+go.seankhliao.com/earbug/v3 v3.0.0-20220612154923-37f6e7c7ac0a h1:6F8V0MGKhaLD4Nl/9dpLbOiiSAXUnzkO1HQSNE04xKA=
+go.seankhliao.com/earbug/v3 v3.0.0-20220612154923-37f6e7c7ac0a/go.mod h1:/bN4YhOM+CIW5KGXbnv+pgX39P4i9MDaSGba130JaKY=
+go.seankhliao.com/gchat v0.0.0-20220612154931-8f1077ccd269 h1:h9gJquY9YFRVXKCLXSyJu8pgYSN2AbDjrBu9CEjBol8=
+go.seankhliao.com/gchat v0.0.0-20220612154931-8f1077ccd269/go.mod h1:wtQXcAF9rzTjUwuqHC1R/B+ytI+W8ztkeaKmSUxu/wE=
 go.seankhliao.com/svcrunner v0.2.3 h1:FPh7VN4nojKS76oReHqFo7BXlPdxArg4wp+cN2jQUnQ=
 go.seankhliao.com/svcrunner v0.2.3/go.mod h1:VfktENBf/znffgHbXsvfW/ycmwBUAIqVHVYEPDWi/LE=
 go.uber.org/atomic v1.7.0/go.mod h1:fEN4uk6kAWBTFdckzkM89CLk9XfWZrxpCo0nPH17wJc=
